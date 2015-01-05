@@ -14,7 +14,7 @@ volatile int16_t string_count = 0;
 /**
 	@brief Interrupt handler
 	@details	It reacts to byte coming or empty D buffer (in UART module).
-						Incoming '\r' (CR) character is converted to '\0' 
+						Incoming CR character is converted to NULL 
 						(comfortable use terminal e.g. Putty)
 */
 #if (UART_MODULE == 0)

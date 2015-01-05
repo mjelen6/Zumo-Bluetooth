@@ -6,19 +6,19 @@ I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5419E3CA)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmInstr.h)(0x53FF38FA)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmFunc.h)(0x53FF38FA)
 I (C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.3.0\Device\Include\system_MKL46Z4.h)(0x51C00508)
-I (bluetooth.h)(0x54AAD453)
+I (bluetooth.h)(0x54AB0067)
 I (skmj_sLCD.h)(0x5491AAFD)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x5419E3CC)
-F (.\bluetooth.c)(0x54AAF693)(-c --cpu Cortex-M0+ -D__EVAL -g -O0 --apcs=interwork -I C:\Users\Maciek\Desktop\Lab_proj\biblioteka_bluetooth2\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.3.0\Device\Include-D_RTE_ -DMKL46Z256xxx4-o .\objects\bluetooth.o --omf_browse .\objects\bluetooth.crf --depend .\objects\bluetooth.d)
+F (.\bluetooth.c)(0x54AAFDC4)(-c --cpu Cortex-M0+ -D__EVAL -g -O0 --apcs=interwork -I C:\Users\Maciek\Desktop\Lab_proj\biblioteka_bluetooth2\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.3.0\Device\Include-D_RTE_ -DMKL46Z256xxx4-o .\objects\bluetooth.o --omf_browse .\objects\bluetooth.crf --depend .\objects\bluetooth.d)
 I (C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.3.0\Device\Include\MKL46Z4.h)(0x51C00508)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cm0plus.h)(0x53FC782A)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5419E3CA)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmInstr.h)(0x53FF38FA)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmFunc.h)(0x53FF38FA)
 I (C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.3.0\Device\Include\system_MKL46Z4.h)(0x51C00508)
-I (bluetooth.h)(0x54AAD453)
+I (bluetooth.h)(0x54AB0067)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x5419E3CC)
-F (.\bluetooth.h)(0x54AAD453)()
+F (.\bluetooth.h)(0x54AB0067)()
 F (.\skmj_sLCD.c)(0x54A9C5B7)(-c --cpu Cortex-M0+ -D__EVAL -g -O0 --apcs=interwork -I C:\Users\Maciek\Desktop\Lab_proj\biblioteka_bluetooth2\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.3.0\Device\Include-D_RTE_ -DMKL46Z256xxx4-o .\objects\skmj_slcd.o --omf_browse .\objects\skmj_slcd.crf --depend .\objects\skmj_slcd.d)
 I (C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.3.0\Device\Include\MKL46Z4.h)(0x51C00508)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cm0plus.h)(0x53FC782A)

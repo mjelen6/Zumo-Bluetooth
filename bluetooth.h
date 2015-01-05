@@ -34,10 +34,10 @@
 /**
 	@brief When OVERWRITE is set and Rx buffer is full the oldest character will be replaced by receiving data.
 	@warning	It can be ONLY 0 or 1!
-						OVERWRITE==1 is required when "string" functions (::bt_getStr, ::bt_senfStr) are used.
-						Otherwise Tx buffer lock may occur (::bt_getStr uses ::string_count which is incremented by '\0' incoming character.
+						OVERWRITE==1 is required when "string" functions (::bt_getStr, ::bt_sendStr) are used.
+						Otherwise Tx buffer lock may occur (::bt_getStr uses ::string_count which is incremented by NULL incoming character.
 						Functions guarantee the continuity of strings, but use it carefully. 
-						Best way is to use still same type of functions (for example ::bt_getChar, ::bt_sendChar / ::bt_getStr, ::bt_senfStr).
+						Best way is to use still same type of functions (for example ::bt_getChar, ::bt_sendChar / ::bt_getStr, ::bt_sendStr).
 						
 */
 #define OVERWRITE 1
@@ -120,15 +120,15 @@ uint8_t bt_sendStr( const char * source );
 					 <li> 0 = Buffer empty or '\0' character (end of string)
 					 <li> other = valid data
 					</ul>
-	@warning	0 ('\0') and 13 ('\r') are reserved. For one-byte commands use another character.
+	@warning	0 (NULL) and 13 (CR) are reserved. For one-byte commands use another character.
 						For more details see interrupt handler.
 */
 char bt_getChar( void );
 /**
-	@brief Function copies string from Rx buffer (if there is any) to ::destination array.
+	@brief Function copies string from Rx buffer (if there is any) to destination array.
 	@param[out] destination Pointer to character array
 	@warning 	Be sure that destination table is big enough to contain incoming string.
-						Incoming string has to be ended with a '\0' (NULL) or '\r' (CR) character.
+						Incoming string has to be ended with a (NULL) or (CR) character.
 */
 void bt_getStr( char * destination );
 
