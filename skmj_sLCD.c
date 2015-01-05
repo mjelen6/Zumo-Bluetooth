@@ -5,7 +5,7 @@
 const uint8_t LCD_Front_Pin[] = {LCD_FRONT0, LCD_FRONT1, LCD_FRONT2, LCD_FRONT3, LCD_FRONT4, LCD_FRONT5, LCD_FRONT6, LCD_FRONT7};
 //const static uint8_t LCD_Back_Pin[] = {LCD_BACK0, LCD_BACK1, LCD_BACK2, LCD_BACK3};
 
-const uint8_t LCD_Digit_2[] = {	( LCD_S_D | LCD_S_E | LCD_S_F ),						//0
+const uint8_t LCD_Digit_2[] = {					( LCD_S_D | LCD_S_E | LCD_S_F ),						//0
 																				( LCD_C ),																	//1
 																				( LCD_S_G | LCD_S_E | LCD_S_D ),						//2
 																				( LCD_S_D | LCD_S_G ),											//3
@@ -26,7 +26,7 @@ const uint8_t LCD_Digit_2[] = {	( LCD_S_D | LCD_S_E | LCD_S_F ),						//0
 
 			
 																				
-const uint8_t LCD_Digit_1[] = {	( LCD_S_A | LCD_S_B | LCD_S_C ),	//0
+const uint8_t LCD_Digit_1[] = {					( LCD_S_A | LCD_S_B | LCD_S_C ),	//0
 																				( LCD_S_B | LCD_S_C ),						//1
 																				( LCD_S_A | LCD_S_B ),						//2
 																				( LCD_S_A | LCD_S_B | LCD_S_C ),	//3

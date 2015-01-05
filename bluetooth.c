@@ -1,137 +1,253 @@
-/*!
- * @file bluetooth.c
- * @version 1.0
- * @date 2014-12-21
- * @brief Biblioteka do obslugi modulu bluetooth dla plytki Freescale FRDM KL46Z
- *
- * Biblioteka do obslugi modulu bluetooth dla plytki Freescale FRDM KL46Z
+/**
+ * @file		bluetooth.c
+ * @brief		Bluetooth library for KL46Z and HC-06 module
  */
-
 #include "MKL46Z4.h"
 #include "bluetooth.h"
 #include <string.h>
 
-volatile UART_BUF_t RxBuf, TxBuf;
+// Global variables
+volatile UART_BUF_t RxBuf;
+volatile UART_BUF_t	TxBuf;
+volatile int16_t string_count = 0;
 
+/**
+	@brief Interrupt handler
+	@details	It reacts to byte coming or empty D buffer (in UART module).
+						Incoming '\r' (CR) character is converted to '\0' 
+						(comfortable use terminal e.g. Putty)
+*/
+#if (UART_MODULE == 0)
 void UART0_IRQHandler(void){
 	
-	if(UART0->S1 & UART_S1_RDRF_MASK){
-		if( !buf_full(&RxBuf) ) to_UART_buffer( UART0->D, &RxBuf );
-#if OVERWRITE==1
-		else	overwrite_UART_buffer( UART0->D, &RxBuf );
+#elif (UART_MODULE == 1)
+void UART1_IRQHandler(void){
+	
+#elif (UART_MODULE == 2)
+void UART2_IRQHandler(void){
+#endif	
+	
+	__disable_irq();
+	
+	if(UART(UART_MODULE)->S1 & UART_S1_RDRF_MASK){
+		
+		char c;
+
+#if OVERWRITE==1	
+		c = UART(UART_MODULE)->D;
+		if( c == '\0' || c == '\r'){
+			string_count++;
+			c = '\0';
+		}
 #endif
+		
+		if( !buf_full(&RxBuf) ){
+			
+#if OVERWRITE==0	
+			c = UART(UART_MODULE)->D;			
+			if( c == '\0' || c == '\r'){
+				string_count++;
+				c = '\0';
+			}
+#endif
+			
+			to_UART_buffer( c, &RxBuf );		
+		}
+		
+#if OVERWRITE==1
+		else	overwrite_UART_buffer( c, &RxBuf );
+#endif
+
 	}
 	
-	if(UART0->S1 & UART_S1_TDRE_MASK){
-		if( buf_empty(&TxBuf) )	UART0->C2 &= ~UART_C2_TIE_MASK;
-		else	UART0->D = from_UART_buffer( &TxBuf );
+	else if(UART(UART_MODULE)->S1 & UART_S1_TDRE_MASK){
+		
+		if( buf_empty(&TxBuf) ){
+			
+			// disable interrupt from transmitter
+			UART(UART_MODULE)->C2 &= ~UART_C2_TIE_MASK;
+			
+			TxBuf.tail = TxBuf.head; // force pointers equalization
+			// Sometimes, when transmitter is hardly loaded,
+			// tail pointer stops to far. "Size" indicator still works fine.
+		}
+		// If Tx buffer isn't empty put in UART next character.
+		else	UART(UART_MODULE)->D = from_UART_buffer( &TxBuf ); 
 	}
+	
+	NVIC_ClearPendingIRQ(UART2_IRQn);
+	__enable_irq();
 }
 
 
-/**
-	Initialize UART0 module. Setting Baud Rate.
-*/
+
 void bt_init( uint32_t baud_rate ){
 
 	uint32_t divisor;
-
-	SIM->SCGC5 |= SIM_SCGC5_PORTA_MASK; // PTA14(TX) PTA15(RX) on mux(3) will be used.
-
-	SIM->SOPT2 |= SIM_SOPT2_UART0SRC(2);
+	
+	
+#if UART_MODULE==0
+	SIM->SCGC5 |= SIM_SCGC5_PORTA_MASK; 	// PTA14(TX) PTA15(RX) on mux(3) will be used.
+	SIM->SOPT2 |= SIM_SOPT2_UART0SRC(2);	// 8MHz ext osc
 	SIM->SCGC4 |= SIM_SCGC4_UART0_MASK;
-
 	PORTA->PCR[14] |= PORT_PCR_MUX(3);
 	PORTA->PCR[15] |= PORT_PCR_MUX(3);
+	
+#elif UART_MODULE==1
+	SIM->SCGC4 |= SIM_SCGC4_UART1_MASK;		// 24MHz bus clk
+	SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK; 	// PTE0(TX) PTE1(RX) on mux(3) will be used.	
+	PORTE->PCR[0] |= PORT_PCR_MUX(3);
+	PORTE->PCR[1] |= PORT_PCR_MUX(3);
+	
+#elif UART_MODULE==2
+	SIM->SCGC4 |= SIM_SCGC4_UART2_MASK;		// 24MHz bus clk
+	SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK; 	// PTE16(TX) PTE17(RX) on mux(3) will be used.	
+	PORTE->PCR[16] |= PORT_PCR_MUX(3);
+	PORTE->PCR[17] |= PORT_PCR_MUX(3);
+#endif
 
-	UART0->C2 &= ~(UART_C2_TE_MASK | UART_C2_RE_MASK);
+	// UART module disable
+	UART(UART_MODULE)->C2 &= ~(UART_C2_TE_MASK | UART_C2_RE_MASK);
 
+	// Setting prescaler value
+#if UART_MODULE==0
 	divisor = (8000000/baud_rate)/16;
-	UART0->BDH &= ~UART_BDH_SBR_MASK;
-	UART0->BDL &= ~UART_BDL_SBR_MASK;	
-	UART0->BDH |= UART_BDH_SBR(divisor>>8);
-	UART0->BDL |= UART_BDL_SBR(divisor);
+#else
+	divisor = (24000000/baud_rate)/16;
+#endif
+
+	// Cearing prescaler register
+	UART(UART_MODULE)->BDH &= ~UART_BDH_SBR_MASK;
+	UART(UART_MODULE)->BDL &= ~UART_BDL_SBR_MASK;	
 	
-	UART0->BDH &= ~UART_BDH_SBNS_MASK;
+	// Writting prescaler value to right register
+	UART(UART_MODULE)->BDH |= UART_BDH_SBR(divisor>>8);
+	UART(UART_MODULE)->BDL |= UART_BDL_SBR(divisor);
 	
-	UART0->C1 &= ~UART_C1_M_MASK;
-	UART0->C1 &= ~UART_C1_PE_MASK;
+	// One stop bit
+	UART(UART_MODULE)->BDH &= ~UART_BDH_SBNS_MASK;
+	// No parity
+	UART(UART_MODULE)->C1 &= ~UART_C1_PE_MASK;
+	// 8-bit mode
+	UART(UART_MODULE)->C1 &= ~UART_C1_M_MASK;
 	
-	NVIC_SetPriority(UART0_IRQn, 1);
+	
+	// Interrupt settings
+#if UART_MODULE==0
+	NVIC_SetPriority(UART0_IRQn, UART_IRQ_PRIORITY);
 	NVIC_ClearPendingIRQ(UART0_IRQn);
 	NVIC_EnableIRQ(UART0_IRQn);
-	UART0->C2 |= (UART_C2_TIE_MASK | UART_C2_RIE_MASK);
+	
+#elif UART_MODULE==1
+	NVIC_SetPriority(UART1_IRQn, UART_IRQ_PRIORITY);
+	NVIC_ClearPendingIRQ(UART1_IRQn);
+	NVIC_EnableIRQ(UART1_IRQn);
+	
+#elif UART_MODULE==2
+	NVIC_SetPriority(UART2_IRQn, UART_IRQ_PRIORITY);
+	NVIC_ClearPendingIRQ(UART2_IRQn);
+	NVIC_EnableIRQ(UART2_IRQn);
+#endif
+
+	// Interrupts enable
+	UART(UART_MODULE)->C2 |= (UART_C2_TIE_MASK | UART_C2_RIE_MASK);
 	
 	buf_clear(&TxBuf);
 	buf_clear(&RxBuf);
-		
-	UART0->C2 |= (UART_C2_TE_MASK | UART_C2_RE_MASK);
+	
+	// UART module enable
+	UART(UART_MODULE)->C2 |= (UART_C2_TE_MASK | UART_C2_RE_MASK);
 }
 
 
 uint8_t bt_sendChar( char data ){
-	uint8_t temp = to_UART_buffer( data, &TxBuf );
 	
-	if( !(UART0->C2 & UART_C2_TIE_MASK) ){
-		UART0->D = from_UART_buffer( &TxBuf );
-		UART0->C2 |= UART_C2_TIE_MASK;
+	uint8_t exit = 0;		// set failure
+	
+	if( !buf_full(&TxBuf) ){
+		to_UART_buffer( data, &TxBuf );
+		exit = 1;			// set success
 	}
-	return temp;
+#if OVERWRITE==1
+	else{
+		overwrite_UART_buffer( data, &TxBuf );
+		exit = 1;			// set success
+	}
+#endif
+	
+	if( !(UART(UART_MODULE)->C2 & UART_C2_TIE_MASK) ){
+		UART(UART_MODULE)->D = from_UART_buffer( &TxBuf );
+		UART(UART_MODULE)->C2 |= UART_C2_TIE_MASK;
+	}
+	return exit;
 }
 
 
 uint8_t bt_sendStr( const char * source ){
-	uint8_t i = 0;
-
-	if( strlen(source)+1 > BUFF_SIZE-1-TxBuf.size ) return 1;
 	
-	while( *(source+i) != '\0' ){
-		bt_sendChar( *(source+i) );
-		++i;
+	uint16_t i = 0;
+	uint16_t len = strlen(source);
+	
+	if( len != 0 ){
+#if OVERWRITE==0		
+		// If string length is greater than free space of TxBuf
+		if( ((len)+1) > ((BUFF_SIZE)-(TxBuf.size)) ) return 0;	// return failure
+#endif	
+		
+		// Send string byte by byte.
+		for(i=0; i<=len; i++)	bt_sendChar( *((source)+i));
+		
 	}
-	bt_sendChar( *(source+i) );
-	return 0;
+	return 1;		// return success
 }
 
 
 char bt_getChar( void ){
 	
-	return from_UART_buffer( &RxBuf );
+	// If RxBuf isn't empty...
+	if( !buf_empty(&RxBuf) ){
+		
+		char c;
+		
+		// ... get one character
+		c = from_UART_buffer( &RxBuf );
+		
+		
+		if( c == '\0' ){
+			string_count--;
+			if(string_count < 0) string_count = 0;  // addictional protection
+		}
+		return c;
+	
+	}
+	else return 0; // If is empty return 0.
 }
 
 
 void bt_getStr( char * destination ){
 	
-	uint16_t i;
+	// If in Rx buffer isn't any string return empty string.
+	if( string_count == 0 ) *destination = '\0';
 	
-	if( buf_empty(&RxBuf) ){
-		*destination = '\0';
-		return;
-	}
-	
-	for( i=0; i<BUFF_SIZE; ++i){
-		if( (RxBuf.buf[i] == 0) || (RxBuf.buf[i] == 13) ) break;
-	}
-	
-	if( i == BUFF_SIZE ) {
-		*destination = '\0';
-		return;
-	}
 	else{
-		i = 0;
-		while( (RxBuf.buf[RxBuf.head] != '\0') && (RxBuf.buf[RxBuf.head] != 13) ){
-			*(destination+i) = from_UART_buffer( &RxBuf );
-			++i;
+		uint16_t i = 0;
+		char c;
+		
+		// ...if is copy one to user array.
+		do{
+			c = bt_getChar();
+			*((destination)+i) = c;
+			i++;
 		}
-		from_UART_buffer( &RxBuf );
-		*(destination+i) = '\0';
-	}	
+		while( c != '\0');
+	}
 }
 
 
 void buf_clear( volatile UART_BUF_t * b ){
 	uint16_t i;
-	for(i=0; i<BUFF_SIZE; ++i) b->buf[i] = 0;		
+	
+	for(i=0; i<BUFF_SIZE; i++) b->buf[i] = 0;		
 		
 	b->head = 0;
 	b->tail = 0;	
@@ -139,57 +255,46 @@ void buf_clear( volatile UART_BUF_t * b ){
 }
 
 
-uint8_t buf_empty( volatile UART_BUF_t * b ){
+uint8_t buf_empty( const volatile UART_BUF_t * b ){
 	
-	if( b->size == 0 ) return 1;
-	else return 0;
+	return (b->size) == 0;
 }
 
 
-uint8_t buf_full( volatile UART_BUF_t * b ){
+uint8_t buf_full( const volatile UART_BUF_t * b ){
 	
-	if( b->size+1 == BUFF_SIZE ) return 1;
-	else return 0;
+	return (b->size) == BUFF_SIZE;
 }
 
 
-uint8_t to_UART_buffer( const char c, volatile UART_BUF_t * b ){
+void to_UART_buffer( const char c, volatile UART_BUF_t * b ){
 	
-	if( !buf_full( b ) ){
-	
-		b->buf[b->tail++] = c;
-		b->tail %= BUFF_SIZE;
-		++(b->size);
-		return 0;
-	}
-	return 1;
+	b->buf[b->tail++] = c;
+	b->tail %= BUFF_SIZE;
+	b->size++;
 }
 
 
 char from_UART_buffer( volatile UART_BUF_t * b ){
+
+	char c = b->buf[b->head];
 	
-	char c = 0;
-	
-	if( !buf_empty( b ) ){
-	
-		c = b->buf[b->head];
-		b->buf[b->head++] = 0;
-		b->head %= BUFF_SIZE;
-		--(b->size);
-	}
+	b->buf[b->head++] = 0;
+	b->head %= BUFF_SIZE;
+	b->size--;
 	return c;
 }
 
 
-uint8_t overwrite_UART_buffer( const char c, volatile UART_BUF_t * b ){
+void overwrite_UART_buffer( const char c, volatile UART_BUF_t * b ){
 
-	if( buf_full( b ) ){
-	
-		b->buf[b->tail++] = c;
-		b->tail %= BUFF_SIZE;
-		b->head++;
-		b->head %= BUFF_SIZE;
-		return 0;
+	if( (b==&RxBuf) && (b->buf[b->tail] == '\0') ){
+		string_count--;
+		if(string_count < 0) string_count = 0;
 	}
-	return 1;
+
+	b->head++;
+	b->head %= BUFF_SIZE;	
+	b->buf[b->tail++] = c;
+	b->tail %= BUFF_SIZE;
 }

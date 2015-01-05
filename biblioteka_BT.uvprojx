@@ -50,7 +50,7 @@
           <OutputName>biblioteka_BT</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\Listings\</ListingPath>
@@ -409,19 +409,9 @@
           <GroupName>Source Group 1</GroupName>
           <Files>
             <File>
-              <FileName>leds.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\leds.c</FilePath>
-            </File>
-            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>leds.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\leds.h</FilePath>
             </File>
             <File>
               <FileName>bluetooth.c</FileName>
@@ -432,16 +422,6 @@
               <FileName>bluetooth.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\bluetooth.h</FilePath>
-            </File>
-            <File>
-              <FileName>motorDriver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\motorDriver.c</FilePath>
-            </File>
-            <File>
-              <FileName>motorDriver.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\motorDriver.h</FilePath>
             </File>
             <File>
               <FileName>skmj_sLCD.c</FileName>

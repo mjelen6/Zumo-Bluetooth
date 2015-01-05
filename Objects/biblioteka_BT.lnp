@@ -1,8 +1,6 @@
 --cpu Cortex-M0+
-".\objects\leds.o"
 ".\objects\main.o"
 ".\objects\bluetooth.o"
-".\objects\motordriver.o"
 ".\objects\skmj_slcd.o"
 ".\objects\startup_mkl46z4.o"
 ".\objects\system_mkl46z4.o"
