@@ -38,11 +38,10 @@
 						Otherwise Tx buffer lock may occur (::bt_getStr uses ::string_count which is incremented by NULL incoming character.
 						Functions guarantee the continuity of strings, but use it carefully. 
 						Best way is to use still same type of functions (for example ::bt_getChar, ::bt_sendChar / ::bt_getStr, ::bt_sendStr).
-						
 */
 #define OVERWRITE 1
 /**
-	@brief Defines how important UART interrupts will be. It can be 1,2 or 3.
+	@brief Defines how important UART interrupts will be. It can be 1, 2 or 3.
 */
 #define UART_IRQ_PRIORITY 1
 
@@ -103,7 +102,7 @@ void bt_init( uint32_t baud_rate );
 */
 uint8_t bt_sendChar( char data );
 /**
-	@brief Function sends string. Like ::bt_sendChar adds characters to Tx buffer). 
+	@brief Function sends string. It adds characters to Tx buffer like ::bt_sendChar. 
 	@param source Pointer to string (name of array that contains characters)
 	@retval uint8_t
 					<ul>

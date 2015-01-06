@@ -15,7 +15,7 @@ volatile int16_t string_count = 0;
 	@brief Interrupt handler
 	@details	It reacts to byte coming or empty D buffer (in UART module).
 						Incoming CR character is converted to NULL 
-						(comfortable use terminal e.g. Putty)
+						(for comfortable usage of terminal e.g. Putty)
 */
 #if (UART_MODULE == 0)
 void UART0_IRQHandler(void){
@@ -31,10 +31,9 @@ void UART2_IRQHandler(void){
 	
 	if(UART(UART_MODULE)->S1 & UART_S1_RDRF_MASK){
 		
-		char c;
+		char c = UART(UART_MODULE)->D;
 
 #if OVERWRITE==1	
-		c = UART(UART_MODULE)->D;
 		if( c == '\0' || c == '\r'){
 			string_count++;
 			c = '\0';
@@ -43,8 +42,7 @@ void UART2_IRQHandler(void){
 		
 		if( !buf_full(&RxBuf) ){
 			
-#if OVERWRITE==0	
-			c = UART(UART_MODULE)->D;			
+#if OVERWRITE==0			
 			if( c == '\0' || c == '\r'){
 				string_count++;
 				c = '\0';
