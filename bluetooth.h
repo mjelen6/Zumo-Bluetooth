@@ -159,7 +159,7 @@ uint8_t buf_empty( const volatile UART_BUF_t * b );
 */
 uint8_t buf_full( const volatile UART_BUF_t * b );
 /**
-	@brief Function getting one character from any UART buffer.
+	@brief Function moving one character to any UART buffer.
 	@param c New character
 	@param b Pointer to buffer
 	@warning Function does not check whether buffer is full.
