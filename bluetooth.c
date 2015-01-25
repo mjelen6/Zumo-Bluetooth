@@ -86,10 +86,11 @@ void bt_init( uint32_t baud_rate ){
 	
 #if UART_MODULE==0
 	SIM->SCGC5 |= SIM_SCGC5_PORTA_MASK; 	// PTA14(TX) PTA15(RX) on mux(3) will be used.
-	SIM->SOPT2 |= SIM_SOPT2_UART0SRC(2);	// 8MHz ext osc
+	SIM->SOPT2 |= SIM_SOPT2_UART0SRC(1);
+	SIM->SOPT2 |= SIM_SOPT2_PLLFLLSEL_MASK;
 	SIM->SCGC4 |= SIM_SCGC4_UART0_MASK;
-	PORTA->PCR[14] |= PORT_PCR_MUX(3);
-	PORTA->PCR[15] |= PORT_PCR_MUX(3);
+	PORTA->PCR[1] |= PORT_PCR_MUX(2);
+	PORTA->PCR[2] |= PORT_PCR_MUX(2);
 	
 #elif UART_MODULE==1
 	SIM->SCGC4 |= SIM_SCGC4_UART1_MASK;		// 24MHz bus clk
@@ -109,7 +110,7 @@ void bt_init( uint32_t baud_rate ){
 
 	// Setting prescaler value
 #if UART_MODULE==0
-	divisor = (8000000/baud_rate)/16;
+	divisor = (48000000/baud_rate)/16;
 #else
 	divisor = (24000000/baud_rate)/16;
 #endif
