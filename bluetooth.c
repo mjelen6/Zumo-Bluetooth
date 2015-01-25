@@ -159,7 +159,7 @@ void bt_init( uint32_t baud_rate ){
 }
 
 
-uint8_t bt_sendChar( char data ){
+uint8_t bt_sendChar(const char data ){
 	
 	uint8_t exit = 0;		// set failure
 	
