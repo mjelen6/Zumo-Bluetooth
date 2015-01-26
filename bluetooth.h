@@ -100,7 +100,7 @@ void bt_init( uint32_t baud_rate );
 					 <li> 1 = Success
 					</ul>
 */
-uint8_t bt_sendChar( char data );
+uint8_t bt_sendChar( const char data );
 /**
 	@brief Function sends string. It adds characters to Tx buffer like ::bt_sendChar. 
 	@param source Pointer to string (name of array that contains characters)
