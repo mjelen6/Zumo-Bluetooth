@@ -73,7 +73,14 @@ void UART2_IRQHandler(void){
 		else	UART(UART_MODULE)->D = from_UART_buffer( &TxBuf ); 
 	}
 	
+#if UART_MODULE==0
+	NVIC_ClearPendingIRQ(UART0_IRQn);
+#elif UART_MODULE==1
+	NVIC_ClearPendingIRQ(UART1_IRQn);
+#elif UART_MODULE==2
 	NVIC_ClearPendingIRQ(UART2_IRQn);
+#endif
+	
 	__enable_irq();
 }
 
@@ -159,7 +166,7 @@ void bt_init( uint32_t baud_rate ){
 }
 
 
-uint8_t bt_sendChar(const char data ){
+uint8_t bt_sendChar( const char data ){
 	
 	uint8_t exit = 0;		// set failure
 	

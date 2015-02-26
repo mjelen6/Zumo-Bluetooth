@@ -4,7 +4,7 @@
  */
 #ifndef BLUETOOTH_H_
 #define BLUETOOTH_H_
-
+#include "MKL46Z4.h"
 
 // User settings
 /**
@@ -35,7 +35,7 @@
 	@brief When OVERWRITE is set and Rx buffer is full the oldest character will be replaced by receiving data.
 	@warning	It can be ONLY 0 or 1!
 						OVERWRITE==1 is required when "string" functions (::bt_getStr, ::bt_sendStr) are used.
-						Otherwise Tx buffer lock may occur (::bt_getStr uses ::string_count which is incremented by NULL incoming character.
+						Otherwise Tx buffer lock may occur (::bt_getStr uses ::string_count which is incremented by NULL incoming character).
 						Functions guarantee the continuity of strings, but use it carefully. 
 						Best way is to use still same type of functions (for example ::bt_getChar, ::bt_sendChar / ::bt_getStr, ::bt_sendStr).
 */
